@@ -27,16 +27,26 @@ pipeline {
                 sh '''
                     echo "working in the docker image"
                     ls -la
+                    npm install
                     node --version
                     npm --version
                     npm ci
                     npm run build
-                    #test -f "/build/index.html" && echo "File exists" || echo "File does not exist"
-                    npm test
+                   
 
                 '''
             }
+        
 
+        }
+        stage('Test')
+        {
+            steps{
+                sh'''
+                #test -f "/build/index.html" && echo "File exists" || echo "File does not exist"
+                npm test
+                '''
+            }
         }
        
     }
