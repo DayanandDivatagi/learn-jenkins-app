@@ -26,11 +26,11 @@ pipeline {
 
                 sh '''
                     echo "working in the docker image"
-                    pwd
                     ls -la
                     node --version
                     npm --version
-
+                    npm ci
+                    npm run build
                 '''
             }
 
