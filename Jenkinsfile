@@ -12,6 +12,29 @@ pipeline {
                 '''
             }
         }
+        stage('With docker file'){
+            agent{
+
+                docker{
+
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+
+            }
+            steps{
+
+                sh '''
+                    echo "working in the docker image"
+                    pwd
+                    ls -a
+                    node --version
+                    npm --version
+
+                '''
+            }
+
+        }
        
     }
 }
