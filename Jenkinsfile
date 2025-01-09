@@ -31,8 +31,8 @@ pipeline {
                     npm --version
                     npm ci
                     npm run build
-                    test -f "/build/index.html" && echo "File exists" || echo "File does not exist"
-                    
+                    #test -f "/build/index.html" && echo "File exists" || echo "File does not exist"
+                    npm test
 
                 '''
             }
