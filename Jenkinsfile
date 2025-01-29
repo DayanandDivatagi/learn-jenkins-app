@@ -2,84 +2,67 @@ pipeline {
     agent any
 
     stages {
-        stage('Without docker image') {
-            steps {
-                sh '''
-                echo "Without docker image"
-                touch no_container.txt
-                ls -a
-                pwd
-                '''
-            }
-        }
-        stage('With docker file'){
-            agent{
+        /*
 
-                docker{
-
-                    image 'mcr.microsoft.com/playwright:v1.50.0-noble'
+        stage('Build') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
                     reuseNode true
                 }
-
             }
-            steps{
-
+            steps {
                 sh '''
-                    echo "working in the docker image"
                     ls -la
-                    npm install
                     node --version
                     npm --version
                     npm ci
                     npm run build
-                   
-
+                    ls -la
                 '''
             }
-        
-
         }
-        stage('Test')
-        {
-            agent{
+        */
 
-                docker{
-
+        stage('Test') {
+            agent {
+                docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
-
             }
-            steps{
-                sh'''
-                test -f build/index.html && echo "File exists" || echo "File does not exist"
-                npm test
+
+            steps {
+                sh '''
+                    #test -f build/index.html
+                    npm test
                 '''
             }
         }
-        stage('E2E')
-        {
-            agent{
 
-                docker{
-
-                    image 'mcr.microsoft.com/playwright:v1.50.0-noble'
+        stage('E2E') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
-
             }
-            steps{
-                sh'''
-               npm install -g serve
-               serve -s build
-               npx playwright test --reporter=html
+
+            steps {
+                sh '''
+                    npm install serve
+                    node_modules/.bin/serve -s build &
+                    sleep 10
+                    npx playwright test --reporter=html
                 '''
             }
         }
     }
-    post{
-        always{
-            junit 'test-results/junit.xml'
+
+    post {
+        always {
+            junit 'jest-results/junit.xml'
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
         }
     }
 }
